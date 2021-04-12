@@ -38,15 +38,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hDC;
+	TCHAR str[] = L"Second Hello World";
+	int num;
+
 	// 메시지 처리하기
-	switch (uMsg) {
-	case WM_CREATE:						//--- WM_CREATE 메시지: 윈도우 생성될 때 호출, 필요한 초기화 작업
+	switch (uMsg)
+	{
+	case WM_PAINT:
+		hDC = BeginPaint(hWnd, &ps);
+
+		num = wcslen(str);		//문자열 길이 저장
+		TextOut(hDC, 0, 0, L"Hello World", strlen("Hello World"));	//0,0에 문자 출력
+
+		TextOut(hDC, 0, 100, str, num);	//0,100에 문자 출력
+		EndPaint(hWnd, &ps);	
 		break;
-	case WM_PAINT:						//--- WM_PAINT 메시지: dc를 얻어 그리기 진행
-		hDC = BeginPaint(hWnd, &ps);	//--- 필요한 그리기를 실행한다.
-		EndPaint(hWnd, &ps);
-		break;
-	case WM_DESTROY:					//--- 프로그램 종료
+
+	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 	}
