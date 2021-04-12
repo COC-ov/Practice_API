@@ -40,13 +40,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	HDC hDC;
 	// 메시지 처리하기
 	switch (uMsg) {
-	case WM_CREATE:
+	case WM_CREATE:						//--- WM_CREATE 메시지: 윈도우 생성될 때 호출, 필요한 초기화 작업
 		break;
-	case WM_PAINT:
-		hDC = BeginPaint(hWnd, &ps);
+	case WM_PAINT:						//--- WM_PAINT 메시지: dc를 얻어 그리기 진행
+		hDC = BeginPaint(hWnd, &ps);	//--- 필요한 그리기를 실행한다.
 		EndPaint(hWnd, &ps);
 		break;
-	case WM_DESTROY:
+	case WM_DESTROY:					//--- 프로그램 종료
 		PostQuitMessage(0);
 		break;
 	}
