@@ -38,14 +38,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hDC;
-	RECT rect = { 50,40,200,120 };	//사각형 정의 x1,y1,x2,y2
+	TCHAR  lpOut[100];
+	int x = 0, y = 0;
 
 	switch (uMsg)
 	{
 	case WM_PAINT:
 		hDC = BeginPaint(hWnd, &ps);
-
-		DrawText(hDC, L"HelloWorld", 10, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);	//dc핸들, 출력할 문자열, 문자열의 길이, 구조체의 주소, 출력형식(한 라인,수직/수평 중앙) 
+		wsprintf(lpOut, L"%d * %d = %d", x, y, x * y);	//서식화된 문자열을 버퍼에 저장한다.
+		TextOut(hDC, x, y, lpOut, lstrlen(lpOut));
 		EndPaint(hWnd, &ps);	
 		break;
 
