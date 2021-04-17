@@ -1,5 +1,8 @@
 #include <windows.h> //--- 윈도우 헤더 파일
 #include <tchar.h>
+#include <stdlib.h>
+#include <time.h>
+
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = L"Window Class Name";
 LPCTSTR lpszWindowName = L"Windows Program 1-2";
@@ -24,7 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 	WndClass.lpszClassName = lpszClass;
 	WndClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	RegisterClassEx(&WndClass);
-	hWnd = CreateWindow(lpszClass, lpszWindowName, WS_SYSMENU|WS_MAXIMIZEBOX|WS_MINIMIZEBOX, 0, 0, 900, 700, NULL, (HMENU)NULL, hInstance, NULL);
+	hWnd = CreateWindow(lpszClass, lpszWindowName, WS_SYSMENU|WS_MAXIMIZEBOX|WS_MINIMIZEBOX, 0, 0, 800, 600, NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	while (GetMessage(&Message, 0, 0, 0)) {
@@ -39,25 +42,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hDC;
 
+	srand(time(NULL));
+	int x = rand() % 701,
+		y = rand() % 501,
+		count = rand() % 81 + 20,
+		R1 = rand() % 256, G1 = rand() % 256, B1 = rand() % 256,
+		R2 = rand() % 256, G2 = rand() % 256, B2 = rand() % 256;
+	TCHAR n[2];
+
+	wsprintf(n, L"%d", rand() % 10);
 	switch (uMsg)
 	{
 	case WM_PAINT:
 		hDC = BeginPaint(hWnd, &ps);
-		SetBkColor(hDC, RGB(100, 200, 50));
-		SetTextColor(hDC, RGB(255, 0, 0));
-		TextOut(hDC, 0, 0, L"Left-Top(0, 0)", strlen("Left-Top(0, 0)"));
-		SetBkColor(hDC, RGB(200, 0, 100));
-		SetTextColor(hDC, RGB(0, 0, 255));
-		TextOut(hDC, 700, 0, L"Right-Top(700, 0)", strlen("Right-Top(700, 0)"));
-		SetBkColor(hDC, RGB(200, 200, 200));
-		SetTextColor(hDC, RGB(180, 0, 0));
-		TextOut(hDC, 350, 300, L"Center(700, 0)", strlen("Center(700, 0)"));
-		SetBkColor(hDC, RGB(100, 250, 100));
-		SetTextColor(hDC, RGB(255, 255, 255));
-		TextOut(hDC, 0, 650, L"Left-bottom(0, 650)", strlen("Left-bottom(0, 650)"));
-		SetBkColor(hDC, RGB(255, 255, 100));
-		SetTextColor(hDC, RGB(255, 100,100));
-		TextOut(hDC, 700, 650, L"Right-bottom(700, 650)", strlen("Right-bottom(700, 650)"));
+
+		SetBkColor(hDC, RGB(R1, G1, B1));
+		SetTextColor(hDC, RGB(R2, G2, B2));
+
+		for (int i = 0; i < count; ++i)
+		{
+			for (int k = 0; k < count; ++k)
+				TextOut(hDC, x+k*8, y+i*15, n, lstrlen(n));
+		}
 
 		EndPaint(hWnd, &ps);	
 		break;
