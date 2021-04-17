@@ -42,34 +42,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hDC;
 
-	srand(time(NULL));
-	int x = rand() % 701,
-		y = rand() % 501,
-		count = rand() % 81 + 20,
-		R1 = rand() % 256, G1 = rand() % 256, B1 = rand() % 256,
-		R2 = rand() % 256, G2 = rand() % 256, B2 = rand() % 256;
-	TCHAR n[2];
+	TCHAR str[2];
 
-	wsprintf(n, L"%d", rand() % 10);
 	switch (uMsg)
 	{
-	case WM_PAINT:
-		hDC = BeginPaint(hWnd, &ps);
-
-		SetBkColor(hDC, RGB(R1, G1, B1));
-		SetTextColor(hDC, RGB(R2, G2, B2));
-
-		for (int i = 0; i < count; ++i)
-		{
-			for (int k = 0; k < count; ++k)
-				TextOut(hDC, x+k*8, y+i*15, n, lstrlen(n));
-		}
-
-		EndPaint(hWnd, &ps);	
-		break;
-
-	case WM_DESTROY:
-		PostQuitMessage(0);
+	case WM_CHAR:
+		hDC = GetDC(hWnd);	//---GetDC()함수로 DC를 얻어옴
+		str[0] = wParam;	//---입력문자:: WndProc함수의 매게변수wParam으로 들어옴
+		str[1] = '\0';		//---문자열은 '\0'으로 끝남
+		TextOut(hDC, 0, 0, str, strlen(str));
+		ReleaseDC(hWnd, hDC);
 		break;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam); // 위의 세 메시지 외의 나머지 메시지는 OS로
