@@ -1,6 +1,8 @@
 #include <windows.h> //--- 윈도우 헤더 파일
 #include <tchar.h>
 #include <stdlib.h>
+#include <stdio.h>
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console" )
 
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = L"Window Class Name";
@@ -9,6 +11,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow)
 {
+
 	HWND hWnd;
 	MSG Message;
 	WNDCLASSEX WndClass;
@@ -38,29 +41,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	HDC hDC;
+	HDC hdc;
 	PAINTSTRUCT ps;
 	static int count = 0;
 	static TCHAR str[80];
+	static int yPos, a;
 
-	switch (uMsg)
-	{
+	switch (uMsg) {
 	case WM_PAINT:
-		hDC = BeginPaint(hWnd, &ps);
-		TextOut(hDC, 0, 0, str, lstrlen(str));		//---문자 출력
+		hdc = BeginPaint(hWnd, &ps);
+		TextOut(hdc, 0, yPos, str, strlen(str));
 		EndPaint(hWnd, &ps);
+		a += 20;
 		break;
 
 	case WM_KEYDOWN:
-		hDC = GetDC(hWnd); //--- GetDC 함수를 사용하여 dc를 얻어옴
-		if (wParam == VK_BACK)	//---백스페이스:마지막 문자열 삭제
-			count--;
+		hdc = GetDC(hWnd);
+		if (wParam == VK_BACK) //--- 백스페이스를 입력하면
+			count--; //--- 한 칸 삭제
+		else if (wParam == VK_RETURN) //--- 엔터키를 입력하면: 문자열을 다음줄에 출력
+		{
+			count = 0; //--- 인덱스 변경
+			yPos += 20; //--- y 위치 변경: 한 줄 아래에 출력
+		}
 		else
-			str[count++] = wParam;	//---그외에는 문자를 문자열 뒤에 붙인다.
-			str[count] = '\0';		//---마지막 문자로 널 추가
-			TextOut(hDC, 0, 0, str, lstrlen(str));
-			ReleaseDC(hWnd, hDC);
-			break;
+			str[count++] = wParam; //--- 그 외에는 문자를 문자열 맨 뒤에 붙인다.
+		str[count] = '\0';
+		TextOut(hdc, 0, yPos, str, lstrlen(str));
+		ReleaseDC(hWnd, hdc);
+		//printf("%d", a);
+
+		break;
+	
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
 	}
-	return DefWindowProc(hWnd, uMsg, wParam, lParam); // 위의 세 메시지 외의 나머지 메시지는 OS로
+
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
