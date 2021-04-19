@@ -39,14 +39,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
+	PAINTSTRUCT ps;
+	static int count = 0;
+	static TCHAR str[80];
 
 	switch (uMsg)
 	{
+	case WM_PAINT:
+		hDC = BeginPaint(hWnd, &ps);
+		TextOut(hDC, 0, 0, str, lstrlen(str));		//---문자 출력
+		EndPaint(hWnd, &ps);
+		break;
+
 	case WM_KEYDOWN:
 		hDC = GetDC(hWnd); //--- GetDC 함수를 사용하여 dc를 얻어옴
-		TextOut(hDC, 0, 0, L"Hello World", lstrlen(L"Hello World"));
-		ReleaseDC(hWnd, hDC);
-		break;
+		if (wParam == VK_BACK)	//---백스페이스:마지막 문자열 삭제
+			count--;
+		else
+			str[count++] = wParam;	//---그외에는 문자를 문자열 뒤에 붙인다.
+			str[count] = '\0';		//---마지막 문자로 널 추가
+			TextOut(hDC, 0, 0, str, lstrlen(str));
+			ReleaseDC(hWnd, hDC);
+			break;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam); // 위의 세 메시지 외의 나머지 메시지는 OS로
 }
