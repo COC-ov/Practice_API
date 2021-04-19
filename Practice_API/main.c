@@ -1,7 +1,6 @@
 #include <windows.h> //--- 윈도우 헤더 파일
 #include <tchar.h>
 #include <stdlib.h>
-#include <time.h>
 
 HINSTANCE g_hInst;
 LPCTSTR lpszClass = L"Window Class Name";
@@ -39,18 +38,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	PAINTSTRUCT ps;
 	HDC hDC;
-
-	TCHAR str[2];
 
 	switch (uMsg)
 	{
-	case WM_CHAR:
-		hDC = GetDC(hWnd);	//---GetDC()함수로 DC를 얻어옴
-		str[0] = wParam;	//---입력문자:: WndProc함수의 매게변수wParam으로 들어옴
-		str[1] = '\0';		//---문자열은 '\0'으로 끝남
-		TextOut(hDC, 0, 0, str, strlen(str));
+	case WM_KEYDOWN:
+		hDC = GetDC(hWnd); //--- GetDC 함수를 사용하여 dc를 얻어옴
+		TextOut(hDC, 0, 0, L"Hello World", lstrlen(L"Hello World"));
 		ReleaseDC(hWnd, hDC);
 		break;
 	}
