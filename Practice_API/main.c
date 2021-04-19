@@ -41,37 +41,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	HDC hdc;
+	HDC hDC;
 	PAINTSTRUCT ps;
-	static int count = 0;
-	static TCHAR str[80];
-	static int yPos, a;
+	static TCHAR str[100];
+	static int count;
 
 	switch (uMsg) {
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		TextOut(hdc, 0, yPos, str, strlen(str));
-		EndPaint(hWnd, &ps);
-		a += 20;
-		break;
-
-	case WM_KEYDOWN:
-		hdc = GetDC(hWnd);
-		if (wParam == VK_BACK) //--- 백스페이스를 입력하면
-			count--; //--- 한 칸 삭제
-		else if (wParam == VK_RETURN) //--- 엔터키를 입력하면: 문자열을 다음줄에 출력
-		{
-			count = 0; //--- 인덱스 변경
-			yPos += 20; //--- y 위치 변경: 한 줄 아래에 출력
-		}
-		else
-			str[count++] = wParam; //--- 그 외에는 문자를 문자열 맨 뒤에 붙인다.
+	case WM_CHAR:		//---1차적으로 문자열을 출력
+		hDC = GetDC(hWnd);
+		str[count++] = wParam;
 		str[count] = '\0';
-		TextOut(hdc, 0, yPos, str, lstrlen(str));
-		ReleaseDC(hWnd, hdc);
-		//printf("%d", a);
-
+		TextOut(hDC, 0, 0, str, lstrlen(str));	//===중복
+		ReleaseDC(hWnd, hDC);
 		break;
+
+	case WM_PAINT:		
+		hDC = BeginPaint(hWnd, &ps);		//---화면이 가렸다 지워지면 다시 문자열을 출력
+		TextOut(hDC, 0, 0, str, strlen(str));//===중복
+		EndPaint(hWnd, &ps);
+		break;
+
 	
 	case WM_DESTROY:
 		PostQuitMessage(0);
