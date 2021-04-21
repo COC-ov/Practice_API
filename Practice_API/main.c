@@ -45,22 +45,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	static TCHAR str[100];
 	static int count;
-
+	
 	switch (uMsg) {
-	case WM_CHAR:		//---1차적으로 문자열을 출력
-		hDC = GetDC(hWnd);
-		str[count++] = wParam;
-		str[count] = '\0';
-		TextOut(hDC, 0, 0, str, lstrlen(str));	//===중복
-		ReleaseDC(hWnd, hDC);
+	case WM_CHAR:
+		str[count++] = wParam;				//---문자 저장
+		str[count] = NULL;
+		InvalidateRect(hWnd, NULL, TRUE);	//---직접출력하지 않고 WM_PAINT에 메시지 발생
 		break;
 
 	case WM_PAINT:		
-		hDC = BeginPaint(hWnd, &ps);		//---화면이 가렸다 지워지면 다시 문자열을 출력
-		TextOut(hDC, 0, 0, str, strlen(str));//===중복
+		hDC = BeginPaint(hWnd, &ps);	
+		TextOut(hDC, 0, 0, str, lstrlen(str));//---문자 출력
 		EndPaint(hWnd, &ps);
 		break;
-
 	
 	case WM_DESTROY:
 		PostQuitMessage(0);
