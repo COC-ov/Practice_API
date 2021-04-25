@@ -43,10 +43,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
+	static SIZE size;
 	static TCHAR str[100];
 	static int count;
 	
 	switch (uMsg) {
+	case WM_CREATE:
+		CreateCaret(hWnd, NULL, 5, 15);	//---캐럿 만들기
+		ShowCaret(hWnd);				//---빈 화면에 캐럿 표시
+		break;
+
 	case WM_CHAR:
 		str[count++] = wParam;				//---문자 저장
 		str[count] = NULL;
@@ -56,10 +62,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:		
 		hDC = BeginPaint(hWnd, &ps);	
 		TextOut(hDC, 0, 0, str, lstrlen(str));//---문자 출력
+		GetTextExtentPoint32(hDC, str, lstrlen(str), &size);	//---문자열 길이 알아내기
+		SetCaretPos(size.cx, 0);								//---캐럿 위치하기
 		EndPaint(hWnd, &ps);
 		break;
 	
 	case WM_DESTROY:
+		HideCaret(hWnd);
+		DestroyCaret();
 		PostQuitMessage(0);
 		break;
 	}
