@@ -44,26 +44,80 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	HDC hDC;
 	PAINTSTRUCT ps;
 	static SIZE size;
-	static TCHAR str[100];
+	static TCHAR str[100], str1[100];
 	static int count;
-	
+	static TCHAR* k = str;
+	static int x[3] = { 1, 1, 1 }, i;
+	int n=0, m=0;
+
 	switch (uMsg) {
 	case WM_CREATE:
-		CreateCaret(hWnd, NULL, 5, 15);	//---캐럿 만들기
-		ShowCaret(hWnd);				//---빈 화면에 캐럿 표시
+		CreateCaret(hWnd, NULL, 5, 15);
+		ShowCaret(hWnd);
 		break;
 
 	case WM_CHAR:
-		str[count++] = wParam;				//---문자 저장
+	
+		str[count++] = wParam;
 		str[count] = NULL;
+
+		if (wParam == ' ')
+		{	
+			x[i++] = _wtoi(k);
+			k = &(str[count]);
+		}
+
+		if (x[0] * x[1] * x[2] == 0)
+		{
+			HideCaret(hWnd);
+			DestroyCaret();
+			PostQuitMessage(0);
+			//printf("%d %d %d \n", x[0], x[1], x[2]);
+		}
+
 		InvalidateRect(hWnd, NULL, TRUE);	//---직접출력하지 않고 WM_PAINT에 메시지 발생
 		break;
 
 	case WM_PAINT:		
-		hDC = BeginPaint(hWnd, &ps);	
-		TextOut(hDC, 0, 0, str, lstrlen(str));//---문자 출력
-		GetTextExtentPoint32(hDC, str, lstrlen(str), &size);	//---문자열 길이 알아내기
-		SetCaretPos(size.cx, 0);								//---캐럿 위치하기
+		hDC = BeginPaint(hWnd, &ps);
+
+		if (i == 3)
+		{
+			if (x[2] > 19)
+			{
+				count = 0;
+				i = 0;
+			}
+			else
+			{
+				for (int i = 1; i < 10; ++i)
+				{
+					wsprintf(str1, L"%d * %d = %d ", x[2], i, x[2] * i);
+					GetTextExtentPoint32(hDC, str1, lstrlen(str1), &size);
+					TextOut(hDC, x[0] + (n * size.cx), x[1] + (m * size.cy), str1, lstrlen(str1));//---문자 출력
+					n++;
+					if ((x[0] + n * size.cx) > 500)
+					{
+						n = 0;
+						m++;
+					}
+				}
+
+			}
+
+			count = 0;
+			i = 0;
+			k = str;
+
+			SetCaretPos(0, 0);
+		}
+		else
+		{
+			GetTextExtentPoint32(hDC, str, lstrlen(str), &size);
+			TextOut(hDC, 0, 0, str, lstrlen(str));//---문자 출력
+			SetCaretPos(size.cx, 0);
+		}
+
 		EndPaint(hWnd, &ps);
 		break;
 	
