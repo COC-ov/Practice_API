@@ -43,19 +43,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
-	HPEN hPen, oldPen;
+	HPEN hBrush, oldBrush;
 
 	switch (uMsg) {
 	case WM_PAINT:		
 		hDC = BeginPaint(hWnd, &ps);
 
-		hPen = CreatePen(PS_DOT, 1, RGB(0, 255, 0));
-		oldPen = (HPEN)SelectObject(hDC, hPen);
+		hBrush = CreateSolidBrush(RGB(0, 255, 0));
+		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
 		
-		Ellipse(hDC, 20, 20, 30, 70);
+		Ellipse(hDC, 20, 20, 300, 700);
 
-		SelectObject(hDC, oldPen);
-		DeleteObject(hPen);
+		SelectObject(hDC, oldBrush);
+		DeleteObject(hBrush);
 
 		EndPaint(hWnd, hDC);
 		break;
