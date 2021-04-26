@@ -29,7 +29,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 	WndClass.lpszClassName = lpszClass;
 	WndClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	RegisterClassEx(&WndClass);
-	hWnd = CreateWindow(lpszClass, lpszWindowName, WS_SYSMENU|WS_MAXIMIZEBOX|WS_MINIMIZEBOX, 0, 0, 800, 600, NULL, (HMENU)NULL, hInstance, NULL);
+	hWnd = CreateWindow(lpszClass, lpszWindowName, WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX, 0, 0, 800, 600, NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	while (GetMessage(&Message, 0, 0, 0)) {
@@ -43,24 +43,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
-	HPEN hBrush, oldBrush;
+	static int timer1Count, timer2Count;
 
 	switch (uMsg) {
-	case WM_PAINT:		
-		hDC = BeginPaint(hWnd, &ps);
-
-		hBrush = CreateSolidBrush(RGB(0, 255, 0));
-		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-		
-		Ellipse(hDC, 20, 20, 300, 700);
-
-		SelectObject(hDC, oldBrush);
-		DeleteObject(hBrush);
-
-		EndPaint(hWnd, hDC);
+	case WM_CREATE:
+		SetTimer(hWnd, 1, 60, NULL);		//0.06초
+		SetTimer(hWnd, 2, 100, NULL);		//0.1초
 		break;
-	
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 1:
+			timer1Count++;	//타이머1이 메시지를 보낼때마다 1증가
+			break;
+		case 2:
+			timer2Count++;
+			break;
+		}
+		InvalidateRect(hWnd, NULL, TRUE);
+		break;
+
+	case WM_PAINT:
+		hDC = BeginPaint(hWnd, &ps);
+		if (timer1Count % 2 == 0)
+			TextOut(hDC, timer1Count * 10, 0, L"Timer1 Count", 12);	//타이머1이 두번 올릴때마다 10씩 오른쪽으로 이동
+		if (timer2Count % 2 == 0)
+			TextOut(hDC, timer2Count * 10, 100, L"Timer2 Count",12);
+
+		EndPaint(hWnd, &ps);
+		break;
+
 	case WM_DESTROY:
+		HideCaret(hWnd);
+		DestroyCaret();
 		PostQuitMessage(0);
 		break;
 	}
