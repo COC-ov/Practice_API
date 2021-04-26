@@ -43,13 +43,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
-	POINT point[10] = { {10,20}, {100,30}, {500,200}, {600, 300}, {200, 300} };
+	HPEN hPen, oldPen;
 
 	switch (uMsg) {
 	case WM_PAINT:		
 		hDC = BeginPaint(hWnd, &ps);
-		Polygon(hDC, point, 5);	//꼭지점의 좌표값이 포함된 배열, 꼭지점의 개수
-		EndPaint(hWnd, &ps);
+
+		hPen = CreatePen(PS_DOT, 1, RGB(0, 255, 0));
+		oldPen = (HPEN)SelectObject(hDC, hPen);
+		
+		Ellipse(hDC, 20, 20, 30, 70);
+
+		SelectObject(hDC, oldPen);
+		DeleteObject(hPen);
+
+		EndPaint(hWnd, hDC);
 		break;
 	
 	case WM_DESTROY:
