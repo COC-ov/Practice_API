@@ -47,8 +47,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_PAINT:		
 		hDC = BeginPaint(hWnd, &ps);
-		MoveToEx(hDC, 10, 30, NULL);	//직선의 시작점으로 이동하기
-		LineTo(hDC, 30, 10);			//직선의 끝점 지정
+		Ellipse(hDC, 0, 0, 100, 100);	//타원 그리기 원이 내접하는 사각형의 좌측상단 좌표값, 우측하단 좌표값
 		EndPaint(hWnd, hDC);
 		break;
 	
