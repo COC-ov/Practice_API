@@ -47,7 +47,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_PAINT:		
 		hDC = BeginPaint(hWnd, &ps);
-		Ellipse(hDC, 0, 0, 100, 100);	//타원 그리기 원이 내접하는 사각형의 좌측상단 좌표값, 우측하단 좌표값
+		Rectangle(hDC, 0, 0, 100, 100);	//두좌표 기준으로 수직수평의 사각형을 그림
 		EndPaint(hWnd, hDC);
 		break;
 	
