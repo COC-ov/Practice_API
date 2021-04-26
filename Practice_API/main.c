@@ -43,12 +43,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
+	POINT point[10] = { {10,20}, {100,30}, {500,200}, {600, 300}, {200, 300} };
 
 	switch (uMsg) {
 	case WM_PAINT:		
 		hDC = BeginPaint(hWnd, &ps);
-		Rectangle(hDC, 0, 0, 100, 100);	//두좌표 기준으로 수직수평의 사각형을 그림
-		EndPaint(hWnd, hDC);
+		Polygon(hDC, point, 5);	//꼭지점의 좌표값이 포함된 배열, 꼭지점의 개수
+		EndPaint(hWnd, &ps);
 		break;
 	
 	case WM_DESTROY:
