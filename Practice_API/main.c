@@ -43,62 +43,109 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
-	static SIZE size;
-	static TCHAR str[1600];	//1600자 까지 저장하는 문자열
-	static int count, h, v		//count:문자를 받을때 마다 하나씩 증가하는 인덱스 값-0으로 자동 초기화, k:80자 이상일시 다음줄로 변경, v:가로좌표
-		,yPos[10] = {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2}, k;	//엔터키입력시 증가
+	HBRUSH hBrush, oldBrush;
+	POINT point1[10] = { {460,300}, {510,250},{560,300},{540,350}, {480,350} },
+		point2[6] = { {290,250}, {340,350},{240,350} },
+		point3[8] = { {350,140}, {450,140},{350,240}, {450,240} },
+		point4[10] = { {350,300}, {400,250},{450,300},{430,350}, {370,350} },
+		point5[6] = { {400,250}, {450,350},{350,350} },
+		point6[8] = { {350,250}, {450,250},{350,350}, {450,350} };
+	static int ch;
+	static int r[4], g[4], b[4];
+
 
 	switch (uMsg) {
 	case WM_CREATE:
-		CreateCaret(hWnd, NULL, 5, 15);		//캐럿 만들기	
-		ShowCaret(hWnd);					//캐럿 표시
+		for (int i = 0; i < 4; ++i)
+		{
+			r[i] = rand() % 256;
+			g[i] = rand() % 256;
+			b[i] = rand() % 256;
+		}
 		break;
 
-	case WM_CHAR:
-		if (wParam == VK_RETURN)	//엔터키 입력 처리
+	case WM_KEYDOWN:
+		switch (wParam)
 		{
-			yPos[k++] = count - 1;	//yPos에 엔터키를 입력 받았을 때 인덱스를 저장
-
-			if (k > 9)
-				k = 0;
+		case VK_RIGHT:
+			ch = 1;
+			break;
+		case VK_LEFT:
+			ch = 2;
+			break;
+		case VK_UP:
+			ch = 3;
+			break;
+		case VK_DOWN:
+			ch = 4;
+			break;
 		}
-		else str[count++] = wParam;
-			str[count] = '\0';
-
-		InvalidateRect(hWnd, NULL, TRUE);	//WM_PAINT호출
+		r[ch-1] = rand() % 256;
+		g[ch-1] = rand() % 256;
+		b[ch-1] = rand() % 256;
+		InvalidateRect(hWnd, NULL, TRUE);
 		break;
 
 	case WM_PAINT:
-		hDC = BeginPaint(hWnd, &ps);
-		v = 0;	//가로 세로 0으로 초기화
-		h = 0; 
-		k = 0;
+		hDC = BeginPaint(hWnd, &ps); 
 
-		GetTextExtentPoint32(hDC, L"윈", 1, &size);	//문자 하나의 너비와 높이 알아두기
+		Rectangle(hDC, 350, 250, 450, 350);
+		//---다각형 그리기---
+		hBrush = CreateSolidBrush(RGB(r[0], g[0], b[0]));
+		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+		Polygon(hDC, point1, 5);	//오각형
+		SelectObject(hDC, oldBrush);
+		DeleteObject(hBrush);
 
-		for (int i = 0; i < lstrlen(str); ++i)
-		{	
-			TextOut(hDC, v * size.cx, h * size.cy, &str[i], 1);	//문자 출력
-			v++;
+		hBrush = CreateSolidBrush(RGB(r[1], g[1], b[1]));
+		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+		Polygon(hDC, point2, 3);	//삼각형
+		SelectObject(hDC, oldBrush);
+		DeleteObject(hBrush);
 
-			while (yPos[k] == i)
-			{
-				k++;
-				h++;
-			}
+		hBrush = CreateSolidBrush(RGB(r[2], g[2], b[2]));
+		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+		Polygon(hDC, point3, 4);	//모레시계
+		SelectObject(hDC, oldBrush);
+		DeleteObject(hBrush);
 
-			if (v % 5 == 0)	//80자가 되면 다음줄에 문자 출력
-			{
-				v = 0;
-				h++;
-			}
-
-			if (h % 5 == 0)	//10줄이 되면 처음으로 돌아가서 덮어쓰기
-				h = 0;
+		hBrush = CreateSolidBrush(RGB(r[3], g[3], b[3]));
+		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+		Pie(hDC, 350, 360, 450, 460, 400, 360, 450, 410);	//파이 모양
+		SelectObject(hDC, oldBrush);
+		DeleteObject(hBrush);
+		
+		switch (ch)
+		{
+		case 1:
+			hBrush = CreateSolidBrush(RGB(r[0], g[0], b[0]));
+			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+			Polygon(hDC, point4, 5);	//오각형
+			SelectObject(hDC, oldBrush);
+			DeleteObject(hBrush);
+			break;
+		case 2:
+			hBrush = CreateSolidBrush(RGB(r[1], g[1], b[1]));
+			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+			Polygon(hDC, point5, 3);	//삼각형
+			SelectObject(hDC, oldBrush);
+			DeleteObject(hBrush);
+			break;
+		case 3:
+			hBrush = CreateSolidBrush(RGB(r[2], g[2], b[2]));
+			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+			Polygon(hDC, point6, 4);	//모레시계
+			SelectObject(hDC, oldBrush);
+			DeleteObject(hBrush);
+			break;
+		case 4:
+			hBrush = CreateSolidBrush(RGB(r[3], g[3], b[3]));
+			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+			Pie(hDC, 350, 250, 450, 350, 400, 250, 450, 300);	//파이 모양
+			SelectObject(hDC, oldBrush);
+			DeleteObject(hBrush);
+			break;
 		}
-
-		SetCaretPos(v * size.cx, h * size.cy);		//캐럿 표시 
-
 		EndPaint(hWnd, &ps);
 		break;
 
