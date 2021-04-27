@@ -8,6 +8,8 @@ HINSTANCE g_hInst;
 LPCTSTR lpszClass = L"Window Class Name";
 LPCTSTR lpszWindowName = L"Windows Program 1-2";
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow)
 {
@@ -29,7 +31,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 	WndClass.lpszClassName = lpszClass;
 	WndClass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	RegisterClassEx(&WndClass);
-	hWnd = CreateWindow(lpszClass, lpszWindowName, WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX, 0, 0, 800, 600, NULL, (HMENU)NULL, hInstance, NULL);
+	hWnd = CreateWindow(lpszClass, lpszWindowName, WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX, 0, 0, 800, 800, NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	while (GetMessage(&Message, 0, 0, 0)) {
@@ -44,108 +46,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	HDC hDC;
 	PAINTSTRUCT ps;
 	HBRUSH hBrush, oldBrush;
-	POINT point1[10] = { {460,300}, {510,250},{560,300},{540,350}, {480,350} },
-		point2[6] = { {290,250}, {340,350},{240,350} },
-		point3[8] = { {350,140}, {450,140},{350,240}, {450,240} },
-		point4[10] = { {350,300}, {400,250},{450,300},{430,350}, {370,350} },
-		point5[6] = { {400,250}, {450,350},{350,350} },
-		point6[8] = { {350,250}, {450,250},{350,350}, {450,350} };
-	static int ch;
-	static int r[4], g[4], b[4];
-
+	static int tNum=2;
 
 	switch (uMsg) {
 	case WM_CREATE:
-		for (int i = 0; i < 4; ++i)
+		SetTimer(hWnd, 1, 30, NULL);
+		break;
+	case WM_TIMER:
+		if (wParam == 1)
 		{
-			r[i] = rand() % 256;
-			g[i] = rand() % 256;
-			b[i] = rand() % 256;
+			SetTimer(hWnd, tNum, 30, NULL);
+			tNum++;
 		}
 		break;
 
 	case WM_KEYDOWN:
-		switch (wParam)
-		{
-		case VK_RIGHT:
-			ch = 1;
-			break;
-		case VK_LEFT:
-			ch = 2;
-			break;
-		case VK_UP:
-			ch = 3;
-			break;
-		case VK_DOWN:
-			ch = 4;
-			break;
-		}
-		r[ch-1] = rand() % 256;
-		g[ch-1] = rand() % 256;
-		b[ch-1] = rand() % 256;
-		InvalidateRect(hWnd, NULL, TRUE);
 		break;
 
 	case WM_PAINT:
 		hDC = BeginPaint(hWnd, &ps); 
-
-		Rectangle(hDC, 350, 250, 450, 350);
-		//---다각형 그리기---
-		hBrush = CreateSolidBrush(RGB(r[0], g[0], b[0]));
-		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-		Polygon(hDC, point1, 5);	//오각형
-		SelectObject(hDC, oldBrush);
-		DeleteObject(hBrush);
-
-		hBrush = CreateSolidBrush(RGB(r[1], g[1], b[1]));
-		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-		Polygon(hDC, point2, 3);	//삼각형
-		SelectObject(hDC, oldBrush);
-		DeleteObject(hBrush);
-
-		hBrush = CreateSolidBrush(RGB(r[2], g[2], b[2]));
-		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-		Polygon(hDC, point3, 4);	//모레시계
-		SelectObject(hDC, oldBrush);
-		DeleteObject(hBrush);
-
-		hBrush = CreateSolidBrush(RGB(r[3], g[3], b[3]));
-		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-		Pie(hDC, 350, 360, 450, 460, 400, 360, 450, 410);	//파이 모양
-		SelectObject(hDC, oldBrush);
-		DeleteObject(hBrush);
-		
-		switch (ch)
+		for (int i = 0; i < 41; ++i)	//줄 41개 그리기
 		{
-		case 1:
-			hBrush = CreateSolidBrush(RGB(r[0], g[0], b[0]));
-			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-			Polygon(hDC, point4, 5);	//오각형
-			SelectObject(hDC, oldBrush);
-			DeleteObject(hBrush);
-			break;
-		case 2:
-			hBrush = CreateSolidBrush(RGB(r[1], g[1], b[1]));
-			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-			Polygon(hDC, point5, 3);	//삼각형
-			SelectObject(hDC, oldBrush);
-			DeleteObject(hBrush);
-			break;
-		case 3:
-			hBrush = CreateSolidBrush(RGB(r[2], g[2], b[2]));
-			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-			Polygon(hDC, point6, 4);	//모레시계
-			SelectObject(hDC, oldBrush);
-			DeleteObject(hBrush);
-			break;
-		case 4:
-			hBrush = CreateSolidBrush(RGB(r[3], g[3], b[3]));
-			oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-			Pie(hDC, 350, 250, 450, 350, 400, 250, 450, 300);	//파이 모양
-			SelectObject(hDC, oldBrush);
-			DeleteObject(hBrush);
-			break;
+			MoveToEx(hDC, 0 + i * 15, 0, NULL);	//세로
+			LineTo(hDC, 0 + i * 15, 600, NULL);
+			MoveToEx(hDC, 0, 0 + i * 15, NULL);	//가로
+			LineTo(hDC, 600, 0 + i * 15, NULL);
+
 		}
+
+		hBrush = CreateSolidBrush(RGB(255, 204, 102));	//주인공 원 그리기
+		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+		Ellipse(hDC, 0, 0, 15, 15);
+		SelectObject(hDC, oldBrush);
+		DeleteObject(hBrush);
+
 		EndPaint(hWnd, &ps);
 		break;
 
@@ -155,4 +89,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
+{
+	HDC hDC;
+	hDC = GetDC(hWnd);
+	HBRUSH hBrush, oldBrush;
+	static int x, y;
+	switch (idEvent)
+	{
+	case 2:
+		x++;
+		y++;
+		break;
+	}
+	hBrush = CreateSolidBrush(RGB(255, 51, 51));
+	oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+	Ellipse(hDC,(20+x)*15, (20+y)*15, (21+x)*15, (21+y)*15);
+	SelectObject(hDC, oldBrush);
+	DeleteObject(hBrush);
+
+	ReleaseDC(hWnd, hDC);
 }
