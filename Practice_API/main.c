@@ -43,40 +43,67 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
-	static int timer1Count, timer2Count;
+	static SIZE size;
+	static TCHAR str[1600];	//1600자 까지 저장하는 문자열
+	static int count, h, v		//count:문자를 받을때 마다 하나씩 증가하는 인덱스 값-0으로 자동 초기화, k:80자 이상일시 다음줄로 변경, v:가로좌표
+		,yPos[10] = {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2}, k;	//엔터키입력시 증가
 
 	switch (uMsg) {
 	case WM_CREATE:
-		SetTimer(hWnd, 1, 60, NULL);		//0.06초
-		SetTimer(hWnd, 2, 100, NULL);		//0.1초
+		CreateCaret(hWnd, NULL, 5, 15);		//캐럿 만들기	
+		ShowCaret(hWnd);					//캐럿 표시
 		break;
 
-	case WM_TIMER:
-		switch (wParam)
+	case WM_CHAR:
+		if (wParam == VK_RETURN)	//엔터키 입력 처리
 		{
-		case 1:
-			timer1Count++;	//타이머1이 메시지를 보낼때마다 1증가
-			break;
-		case 2:
-			timer2Count++;
-			break;
+			yPos[k++] = count - 1;	//yPos에 엔터키를 입력 받았을 때 인덱스를 저장
+
+			yPos[k] = -1;
+
+			if (k > 9)
+				k = 0;
 		}
-		InvalidateRect(hWnd, NULL, TRUE);
+		else str[count++] = wParam;
+			str[count] = '\0';
+
+		InvalidateRect(hWnd, NULL, TRUE);	//WM_PAINT호출
 		break;
 
 	case WM_PAINT:
 		hDC = BeginPaint(hWnd, &ps);
-		if (timer1Count % 2 == 0)
-			TextOut(hDC, timer1Count * 10, 0, L"Timer1 Count", 12);	//타이머1이 두번 올릴때마다 10씩 오른쪽으로 이동
-		if (timer2Count % 2 == 0)
-			TextOut(hDC, timer2Count * 10, 100, L"Timer2 Count",12);
+		v = 0;	//가로 세로 0으로 초기화
+		h = 0; 
+		k = 0;
+
+		GetTextExtentPoint32(hDC, L"윈", 1, &size);	//문자 하나의 너비와 높이 알아두기
+
+		for (int i = 0; i < lstrlen(str); ++i)
+		{	
+			TextOut(hDC, v * size.cx, h * size.cy, &str[i], 1);	//문자 출력
+			v++;
+
+			while (yPos[k++] == i)
+				h++;
+
+			if (v % 5 == 0)	//80자가 되면 다음줄에 문자 출력
+			{
+				v = 0;
+				h++;
+			}
+			if (h % 5 == 0)	//10줄이 되면 처음으로 돌아가서 덮어쓰기
+			{
+				h = 0;
+				k = 0;		//k도 0으로 초기화
+			}
+		}
+
+		SetCaretPos(v * size.cx, h * size.cy);		//캐럿 표시
 
 		EndPaint(hWnd, &ps);
 		break;
 
 	case WM_DESTROY:
-		HideCaret(hWnd);
-		DestroyCaret();
 		PostQuitMessage(0);
 		break;
 	}
