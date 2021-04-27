@@ -97,7 +97,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				h = 0;
 		}
 
-		SetCaretPos(v * size.cx, h * size.cy);		//Ä³·µ Ç¥½Ã
+		SetCaretPos(v * size.cx, h * size.cy);		//Ä³·µ Ç¥½Ã 
 
 		EndPaint(hWnd, &ps);
 		break;
