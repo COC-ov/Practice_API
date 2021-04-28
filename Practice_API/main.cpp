@@ -43,37 +43,75 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hDC;
 	PAINTSTRUCT ps;
-	static RECT rectView;
-	static bool flag;
-	static int x, y;
+	HBRUSH hBrush, oldBrush;
+	static int tNum = 2, x, y, count2, k = 1;
 
 	switch (uMsg) {
 	case WM_CREATE:
-		GetClientRect(hWnd, &rectView);
-		x = 20; y = 20;
+		//SetTimer(hWnd, 1, 300, NULL);
+		break;
+
+	case WM_CHAR:
+		switch (wParam)
+		{
+		case 's':
+		case 'S':
+			SetTimer(hWnd, 2, 50, NULL);
+			break;
+		}
+		break;
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 2:
+			if (count2 % 2 == 0)	//지그재그로 이동
+				x += k;
+			if (count2 % 2 == 1)
+				y += k;
+
+			if (x > 39 || x < 0)
+			{
+				k *= (-1);
+				x += k;
+			}
+
+			if (y > 39 || y < 0)
+			{
+				k *= (-1);
+				y += k;
+			}
+			count2++;	//0.3초마다 count2 1씩 증가
+			break;
+		}
+
+		InvalidateRect(hWnd, NULL, TRUE);
+		break;
+
+	case WM_KEYDOWN:
 		break;
 
 	case WM_PAINT:
 		hDC = BeginPaint(hWnd, &ps);
-		if (flag)
-			SelectObject(hDC, GetStockObject(LTGRAY_BRUSH));
-		Ellipse(hDC, x - 20, y - 20, x + 20, y + 20);
-		EndPaint(hWnd, &ps);
-		break;
-
-	case WM_KEYUP:
-		flag = false;
-		InvalidateRgn(hWnd, NULL, TRUE);
-		break;
-
-	case WM_KEYDOWN:
-		if (wParam == VK_RIGHT)
+		for (int i = 0; i < 41; ++i)	//줄 41개 그리기
 		{
-			flag = true;
-			x += 40;
-			if (x + 20 > rectView.right) x -= 40;
+			MoveToEx(hDC, 0 + i * 15, 0, NULL);	//세로
+			LineTo(hDC, 0 + i * 15, 600);
+			MoveToEx(hDC, 0, 0 + i * 15, NULL);	//가로
+			LineTo(hDC, 600, 0 + i * 15);
+
 		}
-		InvalidateRgn(hWnd, NULL, TRUE);
+
+		hBrush = CreateSolidBrush(RGB(255, 204, 102));	//주인공 원 그리기
+		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
+		Ellipse(hDC, 0 + (x * 15), 0 + (y * 15), 15 + (x * 15), 15 + (y * 15));
+		SelectObject(hDC, oldBrush);
+		DeleteObject(hBrush);
+
+
+		//---꼬리 원 그리기---
+
+		EndPaint(hWnd, &ps);
 		break;
 
 	case WM_DESTROY:
@@ -81,6 +119,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 	}
+
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
