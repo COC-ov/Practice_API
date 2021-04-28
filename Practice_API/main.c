@@ -46,7 +46,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	HDC hDC;
 	PAINTSTRUCT ps;
 	HBRUSH hBrush, oldBrush;
-	static int tNum = 2, x, y, count2, k=1;
+	static int tNum = 2, x, y, count2, k = 1;
 
 	switch (uMsg) {
 	case WM_CREATE:
@@ -57,7 +57,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case 's':
 		case 'S':
-			SetTimer(hWnd, 2, 100, NULL);
+			SetTimer(hWnd, 2, 50, NULL);
 			break;
 		}
 	case WM_TIMER:
@@ -69,13 +69,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (wParam == 2)
 		{
 			if (count2 % 2 == 0)	//지그재그로 이동
-				x+=k;
+				x += k;
 			if (count2 % 2 == 1)
-				y+=k;
+				y += k;
 
-			if (x > 40 || y > 40||x<0||y<0)
-				k*=(-1);
+			if (x > 39 ||x < 0 )
+			{
+				k *= (-1);
+				x += k;
+			}
 
+			if(y > 39 || y < 0)
+			{
+				k *= (-1);
+				y += k;
+			}
 			count2++;	//0.3초마다 count2 1씩 증가
 		}
 
@@ -98,7 +106,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		hBrush = CreateSolidBrush(RGB(255, 204, 102));	//주인공 원 그리기
 		oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-		Ellipse(hDC, 0+(x*15), 0+(y*15), 15 + (x * 15), 15 + (y * 15));
+		Ellipse(hDC, 0 + (x * 15), 0 + (y * 15), 15 + (x * 15), 15 + (y * 15));
 		SelectObject(hDC, oldBrush);
 		DeleteObject(hBrush);
 
@@ -109,6 +117,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_DESTROY:
+		KillTimer(hWnd, 2);
 		PostQuitMessage(0);
 		break;
 	}
