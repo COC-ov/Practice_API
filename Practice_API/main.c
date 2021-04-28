@@ -8,8 +8,6 @@ HINSTANCE g_hInst;
 LPCTSTR lpszClass = L"Window Class Name";
 LPCTSTR lpszWindowName = L"Windows Program 1-2";
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime);
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow)
 {
@@ -59,15 +57,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case 'S':
 			SetTimer(hWnd, 2, 50, NULL);
 			break;
-		}
+	
 	case WM_TIMER:
-		if (wParam == 1)
+		switch (wParam)
 		{
-			SetTimer(hWnd, tNum, 30, TimerProc);
-			tNum++;
-		}
-		if (wParam == 2)
-		{
+		case 2:
 			if (count2 % 2 == 0)	//지그재그로 이동
 				x += k;
 			if (count2 % 2 == 1)
@@ -85,6 +79,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				y += k;
 			}
 			count2++;	//0.3초마다 count2 1씩 증가
+			break;
 		}
 
 		InvalidateRect(hWnd, NULL, TRUE);
@@ -123,26 +118,4 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT idEvent, DWORD dwTime)
-{
-	HDC hDC;
-	hDC = GetDC(hWnd);
-	HBRUSH hBrush, oldBrush;
-	static int x, y;
-	switch (idEvent)
-	{
-	case 2:
-		x++;
-		y++;
-		break;
-	}
-	hBrush = CreateSolidBrush(RGB(255, 51, 51));
-	oldBrush = (HBRUSH)SelectObject(hDC, hBrush);
-	Ellipse(hDC, (20 + x) * 15, (20 + y) * 15, (21 + x) * 15, (21 + y) * 15);
-	SelectObject(hDC, oldBrush);
-	DeleteObject(hBrush);
-
-	ReleaseDC(hWnd, hDC);
 }
